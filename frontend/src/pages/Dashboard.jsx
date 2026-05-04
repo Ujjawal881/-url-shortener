@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
+// 🔥 YOUR LIVE BACKEND URL
+const BASE_URL = "https://url-shortener-h6v7.onrender.com";
+
 export default function Dashboard() {
   const [urls, setUrls] = useState([]);
   const [input, setInput] = useState("");
@@ -30,11 +33,11 @@ export default function Dashboard() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5001/myurls?token=${token}`
+        `${BASE_URL}/myurls?token=${token}`
       );
       setUrls(res.data);
     } catch (err) {
-      console.log(err);
+      console.log("Fetch Error:", err);
     }
   };
 
@@ -46,30 +49,38 @@ export default function Dashboard() {
       const encodedUrl = encodeURIComponent(input);
 
       await axios.get(
-        `http://localhost:5001/shorten?url=${encodedUrl}&token=${token}`
+        `${BASE_URL}/shorten?url=${encodedUrl}&token=${token}`
       );
 
       setInput("");
       fetchUrls();
     } catch (err) {
-      console.log(err);
+      console.log("Create Error:", err);
     }
   };
 
   // ✅ Delete
   const deleteUrl = async (id) => {
-    await axios.get(
-      `http://localhost:5001/delete?id=${id}&token=${token}`
-    );
-    fetchUrls();
+    try {
+      await axios.get(
+        `${BASE_URL}/delete?id=${id}&token=${token}`
+      );
+      fetchUrls();
+    } catch (err) {
+      console.log("Delete Error:", err);
+    }
   };
 
   // ✅ Favorite
   const toggleFav = async (id) => {
-    await axios.get(
-      `http://localhost:5001/favorite?id=${id}&token=${token}`
-    );
-    fetchUrls();
+    try {
+      await axios.get(
+        `${BASE_URL}/favorite?id=${id}&token=${token}`
+      );
+      fetchUrls();
+    } catch (err) {
+      console.log("Fav Error:", err);
+    }
   };
 
   useEffect(() => {
@@ -107,11 +118,19 @@ export default function Dashboard() {
       {/* 🌌 MAIN */}
       <div className="flex-1 p-8">
 
-        {/* Hero Icon */}
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png"
-          className="w-16 mb-6 opacity-80"
-        />
+        {/* Hero */}
+        <div className="flex items-center gap-4 mb-6">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png"
+            className="w-14 opacity-80"
+          />
+          <div>
+            <h2 className="text-xl font-semibold">Shorten & Track Links</h2>
+            <p className="text-gray-400 text-sm">
+              Create smart links, track clicks, and manage favorites.
+            </p>
+          </div>
+        </div>
 
         {/* Input */}
         <motion.div
@@ -134,7 +153,7 @@ export default function Dashboard() {
           </button>
         </motion.div>
 
-        {/* Empty State */}
+        {/* Empty */}
         {urls.length === 0 && (
           <div className="text-center mt-20 opacity-80">
             <img
@@ -145,10 +164,10 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* URL LIST */}
+        {/* LIST */}
         <div className="grid gap-6">
           {urls.map((u) => {
-            const shortUrl = `http://localhost:5001/${u.short_code}`;
+            const shortUrl = `${BASE_URL}/${u.short_code}`;
 
             return (
               <motion.div
@@ -173,6 +192,7 @@ export default function Dashboard() {
                       <a
                         href={shortUrl}
                         target="_blank"
+                        rel="noreferrer"
                         className="text-purple-400 font-semibold"
                       >
                         {shortUrl}

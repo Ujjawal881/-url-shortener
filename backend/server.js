@@ -1,19 +1,33 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
+
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+  })
+);
+
 app.use(express.json());
 
-// ✅ ROUTES
+// ✅ ROOT ROUTE FIRST
+app.get("/", (req, res) => {
+  res.send("Backend is running ✅");
+});
+
+// ROUTES
 const authRoutes = require("./routes/authRoutes");
-const urlRoutes = require("./routes/urlRoutes"); // 👈 ADD THIS
+const urlRoutes = require("./routes/urlRoutes");
 
 app.use("/auth", authRoutes);
-app.use("/", urlRoutes); // 👈 ADD THIS
+app.use("/", urlRoutes);
 
-// ✅ SERVER
-app.listen(5001, () => {
-  console.log("Server running on http://localhost:5001");
+// SERVER
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

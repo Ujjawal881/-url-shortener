@@ -13,10 +13,15 @@ const verifyUser = (token) => {
     return null;
   }
 };
+router.get("/", (req, res) => {
 
+  res.send("Backend is running ✅");
+
+});
 
 
 // ✅ 1. SHORTEN URL
+// SHORTEN URL
 router.get("/shorten", (req, res) => {
   const { token, url } = req.query;
 
@@ -27,7 +32,10 @@ router.get("/shorten", (req, res) => {
   if (!decoded) return res.status(401).send("Invalid token");
 
   const userId = decoded.id;
-  const shortCode = Math.random().toString(36).substring(2, 8);
+
+  const shortCode =
+    Math.random().toString(36).substring(2, 8) +
+    Date.now().toString(36);
 
   db.query(
     "INSERT INTO urls (short_code, long_url, user_id) VALUES (?, ?, ?)",
@@ -39,7 +47,7 @@ router.get("/shorten", (req, res) => {
       }
 
       res.json({
-        shortUrl: `http://localhost:5001/${shortCode}`,
+        shortUrl: `${process.env.BASE_URL}/${shortCode}`,
       });
     }
   );
